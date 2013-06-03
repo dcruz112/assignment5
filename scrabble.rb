@@ -20,8 +20,7 @@ class Scrabble
 	dictionary_array = []
 	start_words = dictionary
 	while start_words < (tiles - 2) do
-		word = lines[start_words + 1]
-		dictionary_array << word
+		dictionary_array << lines[start_words + 1].gsub(/\W/, '')
 		start_words += 1
 	end
 	puts dictionary_array
@@ -33,8 +32,8 @@ class Scrabble
 	tile_letters = []
 	start_tiles = tiles
 	while start_tiles < (lines.length - 3) do
-		tile = lines[start_tiles + 1]
-		tile_array << tile
+		# tile = lines[start_tiles + 1].gsub('a', 'A')
+		tile_array << lines[start_tiles + 1].gsub(/\W/, '')
 		start_tiles += 1
 	end
 
@@ -45,10 +44,9 @@ class Scrabble
 		a += 1
 	end
 
-	puts "TILE letters"
-	puts tile_letters
-	puts "End of tile letters"
+	# tile_letters.gsub('a', 'A')
 
+	puts "TILE array"
 	puts tile_array
 
 end
