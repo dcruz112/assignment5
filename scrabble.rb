@@ -52,9 +52,11 @@ end
 # create tile_letters, same as tile_arrays
 
 tile_letters = []
+tHash = Hash.new([])
 
 tile_array.each do |piece|
 	tile_letters << piece[0]
+	tHash[piece[0].to_sym] = piece[1]
 end
 
 moves = []
@@ -89,14 +91,38 @@ dictionary_array.each do |current_word|
 	end
 end
 
-multipliers = []
+# turn given word into array of its letters' values
 
-board_array.each_with_index do |line, index_row|
-	board_array[index_row].each_with_index do |column, index_col|
-		i = index_row
-		while i < len do
-			multipliers << board_array[index_row][i]
-			i += 1
+tile_vals = []
+
+moves.each do |current_word|
+	word_values = []
+	the_letters = current_word.split(//)
+	the_letters.each do |current_letter|
+		num = tHash[current_letter.to_sym]
+		word_values << num
+	end
+	tile_vals << word_values
+end
+
+multipliers = []
+max = 0
+
+tile_vals.each do |piece|
+	len = piece.length
+	board_array.each_with_index do |line, index_row|
+		board_array[index_row].each_with_index do |column, index_col|
+			if width - index_row >= len
+				i = index_row
+				total = 0
+				while i < len do
+					multipliers << board_array[index_row][i]
+					total += multipliers[i] * piece[i]
+					i += 1
+				end
+			else
+				break
+			end
 		end
 	end
 end
