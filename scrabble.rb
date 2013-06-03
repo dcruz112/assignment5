@@ -100,25 +100,35 @@ moves.each do |current_word|
 	the_letters = current_word.split(//)
 	the_letters.each do |current_letter|
 		num = tHash[current_letter.to_sym]
-		word_values << num
+		word_values << num.to_i
 	end
 	tile_vals << word_values
 end
 
-multipliers = []
 max = 0
+max_word = ""
+max_row = 0
+max_col = 0
+horizontal = true
 
 tile_vals.each do |piece|
 	len = piece.length
+	word = moves[tile_vals.index(piece)]
 	board_array.each_with_index do |line, index_row|
 		board_array[index_row].each_with_index do |column, index_col|
 			if width - index_row >= len
-				i = index_row
+				i = index_col
 				total = 0
 				while i < len do
-					multipliers << board_array[index_row][i]
-					total += multipliers[i] * piece[i]
+					total += board_array[index_row][i].to_i * piece[i]
 					i += 1
+				end
+				if max < total
+					max = total
+					max_word = word.dup
+					max_row = index_row
+					max_col = index_col
+					horizontal = true
 				end
 			else
 				break
@@ -126,3 +136,5 @@ tile_vals.each do |piece|
 		end
 	end
 end
+
+puts max_word
