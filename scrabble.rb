@@ -89,4 +89,14 @@ dictionary_array.each do |current_word|
 	end
 end
 
-puts moves
+multipliers = []
+
+board_array.each_with_index do |line, index_row|
+	board_array[index_row].each_with_index do |column, index_col|
+		i = index_row
+		while i < len do
+			multipliers << board_array[index_row][i]
+			i += 1
+		end
+	end
+end
