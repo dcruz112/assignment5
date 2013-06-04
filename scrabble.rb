@@ -31,8 +31,30 @@ make_arrays(board, dictionary, lines, info, "board")
 make_arrays(dictionary, tiles, lines, info, "dictionary")
 make_arrays(tiles, lines.length - 1, lines, info, "tiles")
 
-height = info[:board].length
-width = info[:board][0].length
+class Board
+
+	@@board = parser.board
+
+	def initialize
+		@parser = Parser.new
+	end
+
+	def height
+		return @@board[0].length
+	end
+
+	def width
+		return @@board.length
+	end
+
+	def mults
+		return @@board
+	end
+
+end
+
+board = Board.new
+field = board.mults
 
 tile_letters = []
 tHash = Hash.new([])
@@ -90,17 +112,14 @@ end
 
 max = { :val => 0, :word => "", :row => 0, :col => 0, :horiz => true }
 
-def check_score(bound, incr_coord, fixed_coord, board, piece, word, len, max, isHoriz)
+def check_score(bound, incr_coord, fixed_coord, field, piece, word, len, max, isHoriz)
 	if bound - incr_coord >= len
 		i = 0
 		total = 0
 		c = incr_coord
 		while i < len do
-			if isHoriz
-				total += board[fixed_coord][c].to_i * piece[i]
-			else
-				total += board[c][fixed_coord].to_i * piece[i]
-			end
+			point_value = isHoriz ? field[fixed_coord][c].to_i : field[c][fixed_coord].to_i
+			total += point_value * piece[i]
 			i += 1
 			c += 1
 		end
@@ -122,10 +141,10 @@ end
 tile_vals.each do |piece|
 	len = piece.length
 	word = moves[tile_vals.index(piece)]
-	info[:board].each_with_index do |line, index_row|
-		info[:board][index_row].each_with_index do |column, index_col|
-			check_score(width, index_col, index_row, info[:board], piece, word, len, max, true)
-			check_score(height, index_row, index_col, info[:board], piece, word, len, max, false)
+	field.each_with_index do |line, index_row|
+		field[index_row].each_with_index do |column, index_col|
+			check_score(board.width, index_col, index_row, field, piece, word, len, max, true)
+			check_score(board.height, index_row, index_col, field, piece, word, len, max, false)
 		end
 	end
 end
@@ -133,7 +152,7 @@ end
 word_letters = max[:word].split(//)
 
 word_letters.each do |letter|
-	info[:board][max[:row]][max[:col]] = letter
+	field[max[:row]][max[:col]] = letter
 	if max[:horiz]
 		max[:col] += 1
 	else
@@ -141,6 +160,6 @@ word_letters.each do |letter|
 	end
 end
 
-info[:board].each do |row|
+field.each do |row|
 	puts row.join ' '
 end
