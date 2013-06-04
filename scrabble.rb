@@ -21,6 +21,10 @@ class Parser
 		end
 		return xray
 	end
+
+	def length
+		return @lines.length
+	end
 end
 
 class Board
@@ -50,7 +54,7 @@ class TileSet
 		parser = Parser.new
 		dict = Dictionary.new
 		tHash = Hash.new([])
-		@pieces = parser.make_arrays(parser.tiles, parser.lines.length - 1, "tiles")
+		@pieces = parser.make_arrays(parser.tiles, parser.length - 1, "tiles")
 		@tile_letters = []
 		@tile_vals = []
 		@moves = dict.possible_moves
