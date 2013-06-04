@@ -15,12 +15,11 @@ dictionary = lines.index{|e| e=~ /dictionary/}
 tiles = lines.index{|e| e=~ /tiles/}
 
 board_array = []
-start_board = board
 
-while start_board < (dictionary - 2) do
-	board_line = lines[start_board + 1].gsub(/\D/, '').split(//)
+while board < (dictionary - 2) do
+	board_line = lines[board + 1].gsub(/\D/, '').split(//)
 	board_array << board_line
-	start_board += 1
+	board += 1
 end
 
 height = board_array.length
@@ -29,24 +28,22 @@ width = board_array[0].length
 # array of the words: "word",
 
 dictionary_array = []
-start_words = dictionary
 
-while start_words < (tiles - 2) do
-	word = lines[start_words + 1].gsub(/\W/, '')
+while dictionary < (tiles - 2) do
+	word = lines[dictionary + 1].gsub(/\W/, '')
 	if word.length <= width || word.length <= height
 		dictionary_array << word
 	end
-	start_words += 1
+	dictionary += 1
 end
 
 # array of the tiles: "a1",
 
 tile_array = []
-start_tiles = tiles
 
-while start_tiles < (lines.length - 3) do
-	tile_array << lines[start_tiles + 1].gsub(/\W/, '')
-	start_tiles += 1
+while tiles < (lines.length - 3) do
+	tile_array << lines[tiles + 1].gsub(/\W/, '')
+	tiles += 1
 end
 
 # create tile_letters, same as tile_arrays
