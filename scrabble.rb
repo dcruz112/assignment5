@@ -14,44 +14,30 @@ dictionary = lines.index{|e| e=~ /dictionary/}
 # tiles = integer of where tiles appears in array
 tiles = lines.index{|e| e=~ /tiles/}
 
-board_array = []
+info = Hash.new([])
 
-while board < (dictionary - 2) do
-	board_line = lines[board + 1].gsub(/\D/, '').split(//)
-	board_array << board_line
-	board += 1
-end
-
-height = board_array.length
-width = board_array[0].length
-
-# array of the words: "word",
-
-dictionary_array = []
-
-while dictionary < (tiles - 2) do
-	word = lines[dictionary + 1].gsub(/\W/, '')
-	if word.length <= width || word.length <= height
-		dictionary_array << word
+def make_arrays(target, ref, lines, info, symbol)
+	xray = []
+	while target < (ref - 2) do
+		x = lines[target + 1].gsub(/\W/, '')
+		x = x.split(//) if symbol == "board"
+		xray << x
+		info[symbol.to_sym] = xray
+		target += 1
 	end
-	dictionary += 1
 end
 
-# array of the tiles: "a1",
+make_arrays(board, dictionary, lines, info, "board")
+make_arrays(dictionary, tiles, lines, info, "dictionary")
+make_arrays(tiles, lines.length - 1, lines, info, "tiles")
 
-tile_array = []
-
-while tiles < (lines.length - 3) do
-	tile_array << lines[tiles + 1].gsub(/\W/, '')
-	tiles += 1
-end
-
-# create tile_letters, same as tile_arrays
+height = info[:board].length
+width = info[:board][0].length
 
 tile_letters = []
 tHash = Hash.new([])
 
-tile_array.each do |piece|
+info[:tiles].each do |piece|
 	tile_letters << piece[0]
 	tHash[piece[0].to_sym] = piece.gsub(/\D/, '').to_i
 end
@@ -60,7 +46,7 @@ moves = []
 
 #For each word, this loop checks if it is possible, given the tiles
 
-dictionary_array.each do |current_word|
+info[:dictionary].each do |current_word|
 	makeable = true
 	word_letters = current_word.split(//) 
 		#Turns the word into an array of its letters
@@ -136,10 +122,10 @@ end
 tile_vals.each do |piece|
 	len = piece.length
 	word = moves[tile_vals.index(piece)]
-	board_array.each_with_index do |line, index_row|
-		board_array[index_row].each_with_index do |column, index_col|
-			check_score(width, index_col, index_row, board_array, piece, word, len, max, true)
-			check_score(height, index_row, index_col, board_array, piece, word, len, max, false)
+	info[:board].each_with_index do |line, index_row|
+		info[:board][index_row].each_with_index do |column, index_col|
+			check_score(width, index_col, index_row, info[:board], piece, word, len, max, true)
+			check_score(height, index_row, index_col, info[:board], piece, word, len, max, false)
 		end
 	end
 end
@@ -150,7 +136,7 @@ i = max[:row]
 j = max[:col]
 
 word_letters.each do |letter|
-	board_array[i][j] = letter
+	info[:board][i][j] = letter
 	if max[:horiz]
 		j += 1
 	else
@@ -158,6 +144,6 @@ word_letters.each do |letter|
 	end
 end
 
-board_array.each do |row|
+info[:board].each do |row|
 	puts row.join ' '
 end
