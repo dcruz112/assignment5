@@ -158,15 +158,12 @@ end
 
 word_letters = max[:word].split(//)
 
-i = max[:row]
-j = max[:col]
-
 word_letters.each do |letter|
-	info[:board][i][j] = letter
+	info[:board][max[:row]][max[:col]] = letter
 	if max[:horiz]
-		j += 1
+		max[:col] += 1
 	else
-		i += 1 
+		max[:row] += 1 
 	end
 end
 
