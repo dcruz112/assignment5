@@ -15,12 +15,11 @@ dictionary = lines.index{|e| e=~ /dictionary/}
 tiles = lines.index{|e| e=~ /tiles/}
 
 board_array = []
-start_board = board
 
-while start_board < (dictionary - 2) do
-	board_line = lines[start_board + 1].gsub(/\D/, '').split(//)
+while board < (dictionary - 2) do
+	board_line = lines[board + 1].gsub(/\D/, '').split(//)
 	board_array << board_line
-	start_board += 1
+	board += 1
 end
 
 height = board_array.length
@@ -29,24 +28,22 @@ width = board_array[0].length
 # array of the words: "word",
 
 dictionary_array = []
-start_words = dictionary
 
-while start_words < (tiles - 2) do
-	word = lines[start_words + 1].gsub(/\W/, '')
+while dictionary < (tiles - 2) do
+	word = lines[dictionary + 1].gsub(/\W/, '')
 	if word.length <= width || word.length <= height
 		dictionary_array << word
 	end
-	start_words += 1
+	dictionary += 1
 end
 
 # array of the tiles: "a1",
 
 tile_array = []
-start_tiles = tiles
 
-while start_tiles < (lines.length - 3) do
-	tile_array << lines[start_tiles + 1].gsub(/\W/, '')
-	start_tiles += 1
+while tiles < (lines.length - 3) do
+	tile_array << lines[tiles + 1].gsub(/\W/, '')
+	tiles += 1
 end
 
 # create tile_letters, same as tile_arrays
@@ -110,22 +107,17 @@ max_word = ""
 max_row = 0
 max_col = 0
 horizontal = true
-tile_vals.each do |the_letters|
 
+tile_vals.each do |the_letters|
 	# the_letters: array of the tile values for one word
 	len = the_letters.length
 	word = moves[tile_vals.index(the_letters)]
-
 	w = 0
-
 	# loop do each column, w is the column
 	while w < width
-		# puts line[w]
-
 		# loop within each column
 		h = 0
 		# board_array.each_with_index do |line, row|
-
 			while len + h <= height
 				i = 0
 				total = 0
@@ -140,17 +132,46 @@ tile_vals.each do |the_letters|
 					max_row = h
 					max_col = w
 					horizontal = false
-
 				end
 				# puts total
 				h += 1
 			end
-		w += 1
+			w += 1
+		
 	end
+end
+
+
+tile_vals.each do |piece|
+	len = piece.length
+	word = moves[tile_vals.index(piece)]
+	board_array.each_with_index do |line, index_row|
+		board_array[index_row].each_with_index do |column, index_col|
+			if width - index_row >= len
+				i = index_col
+				total = 0
+				while i < len do
+					total += board_array[index_row][i].to_i * piece[i]
+					i += 1
+				end
+				if max < total
+					max = total
+					max_word = word.dup
+					max_row = index_row
+					max_col = index_col
+					horizontal = true
+				end
+			else
+				break
+			end
+		end
+	end
+end
+
 	puts max_word
 	puts max
 	puts max_row
 	puts max_col
 	puts horizontal
-end
+
 
