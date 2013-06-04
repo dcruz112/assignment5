@@ -134,4 +134,17 @@ tile_vals.each do |piece|
 	end
 end
 
+word_letters = max_word.split(//)
+
+word_letters.each do |letter|
+	board_array[max_col][max_row] = letter
+	if horizontal
+		max_row += 1
+	else
+		max_col += 1 
+	end
+end
 puts max_word
+board_array.each do |row|
+	puts row.join ' '
+end
