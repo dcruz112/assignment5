@@ -169,8 +169,6 @@ tile_vals.each do |piece|
 	end
 end
 
-puts max
-
 word_letters = max_word.split(//)
 
 word_letters.each do |letter|
