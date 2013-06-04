@@ -102,69 +102,59 @@ moves.each do |current_word|
 	tile_vals << word_values
 end
 
-max = 0
-max_word = ""
-max_row = 0
-max_col = 0
-horizontal = true
+max = { :val => 0, :word => "", :row => 0, :col => 0, :horiz => true }
+
+def check_score(bound, incr_coord, fixed_coord, board, piece, word, len, max, isHoriz)
+	if bound - incr_coord >= len
+		i = 0
+		total = 0
+		c = incr_coord
+		while i < len do
+			if isHoriz
+				total += board[fixed_coord][c].to_i * piece[i]
+			else
+				total += board[c][fixed_coord].to_i * piece[i]
+			end
+			i += 1
+			c += 1
+		end
+		if max[:val] < total
+			max[:val] = total
+			max[:word] = word.dup
+			if isHoriz
+				max[:row] = fixed_coord
+				max[:col] = incr_coord
+			else
+				max[:row] = incr_coord
+				max[:col] = fixed_coord
+			end
+			max[:horiz] = isHoriz
+		end
+	end
+end
 
 tile_vals.each do |piece|
 	len = piece.length
 	word = moves[tile_vals.index(piece)]
 	board_array.each_with_index do |line, index_row|
 		board_array[index_row].each_with_index do |column, index_col|
-			if width - index_col >= len
-				i = 0
-				total = 0
-				c = index_col
-				while i < len do
-					total += board_array[index_row][c].to_i * piece[i]
-					i += 1
-					c += 1
-				end
-				if max < total
-					max = total
-					max_word = word.dup
-					max_row = index_row
-					max_col = index_col
-					horizontal = true
-				end
-			else
-				break
-			end
-			if height - index_row >= len
-				i = 0
-				total = 0
-				c = index_row
-				while i < len do
-					total += board_array[c][index_col].to_i * piece[i]
-					i += 1
-					c += 1
-				end
-				if max < total
-					max = total
-					max_word = word.dup
-					max_row = index_row
-					max_col = index_col
-					horizontal = false
-				end
-			else
-				break	
-			end
+			check_score(width, index_col, index_row, board_array, piece, word, len, max, true)
+			check_score(height, index_row, index_col, board_array, piece, word, len, max, false)
 		end
 	end
 end
 
-puts max
+word_letters = max[:word].split(//)
 
-word_letters = max_word.split(//)
+i = max[:row]
+j = max[:col]
 
 word_letters.each do |letter|
-	board_array[max_row][max_col] = letter
-	if horizontal
-		max_col += 1
+	board_array[i][j] = letter
+	if max[:horiz]
+		j += 1
 	else
-		max_row += 1 
+		i += 1 
 	end
 end
 
