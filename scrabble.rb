@@ -11,7 +11,7 @@ class Parser
 		@info = Hash.new([])
 	end
 
-	def make_arrays(target, ref, info, symbol)
+	def make_arrays(target, ref, symbol)
 		xray = []
 		while target < (ref - 2) do
 			x = @lines[target + 1].gsub(/\W/, '')
@@ -21,6 +21,27 @@ class Parser
 		end
 		return xray
 	end
+end
+
+class Board
+	# @@board = []
+	def initialize
+		parser = Parser.new
+		@board = parser.make_arrays(parser.board, parser.dictionary, "board")
+	end
+
+	def height
+		return @board[0].length
+	end
+
+	def width
+		return @board.length
+	end
+
+	def mults
+		return @board
+	end
+
 end
 
 
@@ -53,31 +74,6 @@ def make_arrays(target, ref, lines, info, symbol)
 	end
 end
 
-make_arrays(board, dictionary, lines, info, "board")
-make_arrays(dictionary, tiles, lines, info, "dictionary")
-make_arrays(tiles, lines.length - 1, lines, info, "tiles")
-
-class Board
-
-	@@board = parser.board
-
-	def initialize
-		@parser = Parser.new
-	end
-
-	def height
-		return @@board[0].length
-	end
-
-	def width
-		return @@board.length
-	end
-
-	def mults
-		return @@board
-	end
-
-end
 
 board = Board.new
 field = board.mults
@@ -185,6 +181,7 @@ word_letters.each do |letter|
 		max[:row] += 1 
 	end
 end
+
 
 field.each do |row|
 	puts row.join ' '
