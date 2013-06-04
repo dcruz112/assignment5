@@ -1,3 +1,29 @@
+class Parser
+	attr_accessor :board, :dictionary, :tiles, :lines
+
+	def initialize
+		File.open("INPUT.json") do |file|
+			@lines = file.map { |line| line }
+		end
+		@board = @lines.index{|e| e=~ /board/}
+		@dictionary = @lines.index{|e| e=~ /dictionary/}
+		@tiles = @lines.index{|e| e=~ /tiles/}
+		@info = Hash.new([])
+	end
+
+	def make_arrays(target, ref, info, symbol)
+		xray = []
+		while target < (ref - 2) do
+			x = @lines[target + 1].gsub(/\W/, '')
+			x = x.split(//) if symbol == "board"
+			xray << x
+			target += 1
+		end
+		return xray
+	end
+end
+
+
 # lines = array of the input file
 lines=[]
 
