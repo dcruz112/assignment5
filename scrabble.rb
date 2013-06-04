@@ -108,39 +108,6 @@ max_row = 0
 max_col = 0
 horizontal = true
 
-tile_vals.each do |the_letters|
-	# the_letters: array of the tile values for one word
-	len = the_letters.length
-	word = moves[tile_vals.index(the_letters)]
-	w = 0
-	# loop do each column, w is the column
-	while w < width
-		# loop within each column
-		h = 0
-		# board_array.each_with_index do |line, row|
-			while len + h <= height
-				i = 0
-				total = 0
-				while i < len
-					mult = board_array[i + h][w].to_i
-					total += mult * the_letters[i].to_i
-					i += 1
-				end
-				if total > max
-					max = total
-					max_word = word.dup
-					max_row = h
-					max_col = w
-					horizontal = false
-				end
-				# puts total
-				h += 1
-			end
-			w += 1
-		
-	end
-end
-
 tile_vals.each do |piece|
 	len = piece.length
 	word = moves[tile_vals.index(piece)]
@@ -165,9 +132,30 @@ tile_vals.each do |piece|
 			else
 				break
 			end
+			if height - index_row >= len
+				i = 0
+				total = 0
+				c = index_row
+				while i < len do
+					total += board_array[c][index_col].to_i * piece[i]
+					i += 1
+					c += 1
+				end
+				if max < total
+					max = total
+					max_word = word.dup
+					max_row = index_row
+					max_col = index_col
+					horizontal = false
+				end
+			else
+				break	
+			end
 		end
 	end
 end
+
+puts max
 
 word_letters = max_word.split(//)
 
