@@ -184,3 +184,4 @@ end
 
 board_array.each do |row|
 	puts row.join ' '
+end
