@@ -53,7 +53,7 @@ tHash = Hash.new([])
 
 tile_array.each do |piece|
 	tile_letters << piece[0]
-	tHash[piece[0].to_sym] = piece[1]
+	tHash[piece[0].to_sym] = piece.gsub(/\D/, '').to_i
 end
 
 moves = []
@@ -96,7 +96,7 @@ moves.each do |current_word|
 	word_values = []
 	the_letters = current_word.split(//)
 	the_letters.each do |current_letter|
-		num = tHash[current_letter.to_sym].to_i
+		num = tHash[current_letter.to_sym] #.to_i
 		word_values << num
 	end
 	tile_vals << word_values
@@ -141,7 +141,6 @@ tile_vals.each do |the_letters|
 	end
 end
 
-
 tile_vals.each do |piece|
 	len = piece.length
 	word = moves[tile_vals.index(piece)]
@@ -168,10 +167,10 @@ tile_vals.each do |piece|
 	end
 end
 
-	puts max_word
-	puts max
-	puts max_row
-	puts max_col
-	puts horizontal
+puts max_word
+puts max
+puts max_row
+puts max_col
+puts horizontal
 
 
