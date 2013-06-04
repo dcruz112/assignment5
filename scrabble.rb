@@ -53,7 +53,7 @@ tHash = Hash.new([])
 
 tile_array.each do |piece|
 	tile_letters << piece[0]
-	tHash[piece[0].to_sym] = piece[1]
+	tHash[piece[0].to_sym] = piece.gsub(/\D/, '').to_i
 end
 
 moves = []
@@ -89,15 +89,15 @@ dictionary_array.each do |current_word|
 end
 
 # turn given word into array of its letters' values
-
+# array of arrays
 tile_vals = []
 
 moves.each do |current_word|
 	word_values = []
 	the_letters = current_word.split(//)
 	the_letters.each do |current_letter|
-		num = tHash[current_letter.to_sym]
-		word_values << num.to_i
+		num = tHash[current_letter.to_sym] #.to_i
+		word_values << num
 	end
 	tile_vals << word_values
 end
@@ -108,17 +108,52 @@ max_row = 0
 max_col = 0
 horizontal = true
 
+tile_vals.each do |the_letters|
+	# the_letters: array of the tile values for one word
+	len = the_letters.length
+	word = moves[tile_vals.index(the_letters)]
+	w = 0
+	# loop do each column, w is the column
+	while w < width
+		# loop within each column
+		h = 0
+		# board_array.each_with_index do |line, row|
+			while len + h <= height
+				i = 0
+				total = 0
+				while i < len
+					mult = board_array[i + h][w].to_i
+					total += mult * the_letters[i].to_i
+					i += 1
+				end
+				if total > max
+					max = total
+					max_word = word.dup
+					max_row = h
+					max_col = w
+					horizontal = false
+				end
+				# puts total
+				h += 1
+			end
+			w += 1
+		
+	end
+end
+
 tile_vals.each do |piece|
 	len = piece.length
 	word = moves[tile_vals.index(piece)]
 	board_array.each_with_index do |line, index_row|
 		board_array[index_row].each_with_index do |column, index_col|
-			if width - index_row >= len
-				i = index_col
+			if width - index_col >= len
+				i = 0
 				total = 0
+				c = index_col
 				while i < len do
-					total += board_array[index_row][i].to_i * piece[i]
+					total += board_array[index_row][c].to_i * piece[i]
 					i += 1
+					c += 1
 				end
 				if max < total
 					max = total
@@ -134,17 +169,19 @@ tile_vals.each do |piece|
 	end
 end
 
+puts max
+
 word_letters = max_word.split(//)
 
 word_letters.each do |letter|
-	board_array[max_col][max_row] = letter
+	board_array[max_row][max_col] = letter
 	if horizontal
-		max_row += 1
+		max_col += 1
 	else
-		max_col += 1 
+		max_row += 1 
 	end
 end
-puts max_word
+
 board_array.each do |row|
 	puts row.join ' '
 end
