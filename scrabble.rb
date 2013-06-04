@@ -92,37 +92,65 @@ dictionary_array.each do |current_word|
 end
 
 # turn given word into array of its letters' values
-
+# array of arrays
 tile_vals = []
 
 moves.each do |current_word|
 	word_values = []
 	the_letters = current_word.split(//)
 	the_letters.each do |current_letter|
-		num = tHash[current_letter.to_sym]
+		num = tHash[current_letter.to_sym].to_i
 		word_values << num
 	end
 	tile_vals << word_values
 end
 
-multipliers = []
 max = 0
+max_word = ""
+max_row = 0
+max_col = 0
+horizontal = true
+tile_vals.each do |the_letters|
 
-tile_vals.each do |piece|
-	len = piece.length
-	board_array.each_with_index do |line, index_row|
-		board_array[index_row].each_with_index do |column, index_col|
-			if width - index_row >= len
-				i = index_row
+	# the_letters: array of the tile values for one word
+	len = the_letters.length
+	word = moves[tile_vals.index(the_letters)]
+
+	w = 0
+
+	# loop do each column, w is the column
+	while w < width
+		# puts line[w]
+
+		# loop within each column
+		h = 0
+		# board_array.each_with_index do |line, row|
+
+			while len + h <= height
+				i = 0
 				total = 0
-				while i < len do
-					multipliers << board_array[index_row][i]
-					total += multipliers[i] * piece[i]
+				while i < len
+					mult = board_array[i + h][w].to_i
+					total += mult * the_letters[i].to_i
 					i += 1
 				end
-			else
-				break
+				if total > max
+					max = total
+					max_word = word.dup
+					max_row = h
+					max_col = w
+					horizontal = false
+
+				end
+				# puts total
+				h += 1
 			end
-		end
+		w += 1
 	end
+	puts max_word
+	puts max
+	puts max_row
+	puts max_col
+	puts horizontal
 end
+
