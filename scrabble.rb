@@ -279,14 +279,10 @@ word_letters.each do |letter|
 	max[:horiz] ? max[:col] += 1 : max[:row] += 1
 end
 
-fname = "output.json"
-outputf = File.open(fname, "w")
+output = File.open("OUTPUT.json", "w")
 field.each do |row|
-ans = row.join ' '
-outputf.puts ans
+	ans = row.join ' '
+	output.puts ans
 end
-outputf.close
+output.close
 
-# field.each do |row|
-# 	puts row.join ' '
-# end
