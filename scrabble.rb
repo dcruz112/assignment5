@@ -158,15 +158,14 @@ class Scorer
 
 	def initialize
 		@max = { :val => 0, :word => "", :row => 0, :col => 0, :horiz => true }
-		@i = 0
-		@c = 0
-		@total = 0
 		@point_value = 0
 		board = Board.new
 		@field = board.mults
 	end
 
 	def check_score(bound, incr_coord, fixed_coord, piece, word, isHoriz)
+		@total = 0
+		@i = 0
 		@len = piece.length
 		if bound - incr_coord >= @len
 			@c = incr_coord
@@ -222,6 +221,8 @@ vals.each do |piece|
 		end
 	end
 end
+
+
 
 word_letters = max[:word].split(//)
 
