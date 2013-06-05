@@ -1,14 +1,18 @@
 class Parser
+
 	attr_accessor :board, :dictionary, :tiles
 
 	def initialize
+
 		# Make array of lines of the input file
+
 		@lines = []
 		File.open("INPUT.json") do |file|
 			@lines = file.map { |line| line }
 		end
 
 		# Find where in the array these words appear
+
 		@board = @lines.index{|e| e=~ /board/}
 		@dictionary = @lines.index{|e| e=~ /dictionary/}
 		@tiles = @lines.index{|e| e=~ /tiles/}
@@ -285,4 +289,3 @@ field.each do |row|
 	output.puts ans
 end
 output.close
-
