@@ -105,18 +105,16 @@ class Dictionary
 
 	def possible_moves
 
-		#For each word, this loop checks if it is possible, given the tiles
-
+		# For each word, this loop checks if it is possible, given the tiles
 		@dictionary.each do |current_word|
 			@makeable = true
 			@tiles_dup = @tile_list.dup
 			word_letters = current_word.split(//) 
 				#Turns the word into an array of its letters
 
-			#For each letter in the word, the loop checks if the current letter 
-			#is an available tile in the duplicate list if it is possible, the 
-			#letter is deleted from word_letters and the list of available tiles
-
+			# For each letter in the word, the loop checks if the current letter 
+			# is an available tile in the duplicate list. If it is possible, the 
+			# letter is deleted from word_letters and the list of available tiles
 			word_letters.each do |current_letter|
 				if @tiles_dup.include? current_letter
 					@tiles_dup.delete_at(@tiles_dup.index(current_letter))
@@ -126,9 +124,8 @@ class Dictionary
 				end
 			end
 
-			#If there are any letters that did not match to a tile, then valid 
-			#will be false. Otherwise, it's added to the array of possible words
-
+			# If there are any letters that did not match to a tile, then valid 
+			# will be false. Otherwise, it's added to the array of possible words
 			if @makeable
 				@moves << current_word
 			end
@@ -136,6 +133,8 @@ class Dictionary
 		return @moves
 	end
 
+	# turn makeable words into array of their letters, puts each array into
+	# vals, an array containing arrays of each words' letters
 	def move_vals
 		vals = []
 		@moves.each do |word|
@@ -150,7 +149,6 @@ class Dictionary
 		end
 		return vals
 	end
-
 end
 
 class Scorer
