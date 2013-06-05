@@ -28,8 +28,6 @@ class Parser
 	end
 end
 
-parser = Parser.new
-
 class Board
 
 	def initialize
@@ -154,6 +152,53 @@ class Dictionary
 
 end
 
+class Scorer
+
+	attr_accessor :max
+
+	def initialize
+		@max = { :val => 0, :word => "", :row => 0, :col => 0, :horiz => true }
+		@i = 0
+		@c = 0
+		@total = 0
+		@point_value = 0
+		board = Board.new
+		@field = board.mults
+	end
+
+	def check_score(bound, incr_coord, fixed_coord, piece, word, isHoriz)
+		@len = piece.length
+		if bound - incr_coord >= @len
+			@c = incr_coord
+			while @i < @len do
+				@point_value = isHoriz ? @field[fixed_coord][@c].to_i : @field[@c][fixed_coord].to_i
+				@total += @point_value * piece[@i]
+				@i += 1
+				@c += 1
+			end
+			check_max(@total, word, isHoriz, fixed_coord, incr_coord)
+		end
+
+		return @max
+	end
+
+	def check_max(comp_total, comp_word, bool, comp_fcoord, comp_icoord)
+		if @max[:val] < comp_total
+			@max[:val] = comp_total
+			@max[:word] = comp_word
+			if bool
+				@max[:row] = comp_fcoord
+				@max[:col] = comp_icoord
+			else
+				@max[:row] = comp_icoord
+				@max[:col] = comp_fcoord
+			end
+			@max[:horiz] = bool
+		end
+	end
+
+end
+
 board = Board.new
 field = board.mults
 
@@ -165,41 +210,15 @@ dict = Dictionary.new
 moves = dict.possible_moves
 vals = dict.move_vals
 
-max = { :val => 0, :word => "", :row => 0, :col => 0, :horiz => true }
-
-def check_score(bound, incr_coord, fixed_coord, field, piece, word, len, max, isHoriz)
-	if bound - incr_coord >= len
-		i = 0
-		total = 0
-		c = incr_coord
-		while i < len do
-			point_value = isHoriz ? field[fixed_coord][c].to_i : field[c][fixed_coord].to_i
-			total += point_value * piece[i]
-			i += 1
-			c += 1
-		end
-		if max[:val] < total
-			max[:val] = total
-			max[:word] = word.dup
-			if isHoriz
-				max[:row] = fixed_coord
-				max[:col] = incr_coord
-			else
-				max[:row] = incr_coord
-				max[:col] = fixed_coord
-			end
-			max[:horiz] = isHoriz
-		end
-	end
-end
+scorer = Scorer.new
+max = scorer.max
 
 vals.each do |piece|
-	len = piece.length
 	word = moves[vals.index(piece)]
 	field.each_with_index do |line, index_row|
 		field[index_row].each_with_index do |column, index_col|
-			check_score(board.width, index_col, index_row, field, piece, word, len, max, true)
-			check_score(board.height, index_row, index_col, field, piece, word, len, max, false)
+			max = scorer.check_score(board.width, index_col, index_row, piece, word, true)
+			max = scorer.check_score(board.height, index_row, index_col, piece, word, false)
 		end
 	end
 end
@@ -214,7 +233,6 @@ word_letters.each do |letter|
 		max[:row] += 1 
 	end
 end
-
 
 field.each do |row|
 	puts row.join ' '
