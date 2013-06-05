@@ -53,30 +53,34 @@ class TileSet
 
 	def initialize
 		parser = Parser.new
-		@tHash = Hash.new([])
 		@pieces = parser.make_arrays(parser.tiles, parser.length - 1, "tiles")
-		@tile_letters = []
-		@tile_vals = []
-		@word_values = []
-		@letters = []
-		@num = 0
 	end
 
+	#Creates an array with the letters of each tiles
+
 	def letters
+		@tile_letters = []
 		@pieces.each do |piece|
 			@tile_letters << piece[0]
 		end
 		return @tile_letters
 	end
+
+	#Creates an array with the values of each tiles
 	
 	def values
+		@tile_vals = []
 		@pieces.each do |piece|
 			@tile_vals << piece.gsub(/\D/, '').to_i
 		end
 		return @tile_vals
 	end
 
+	#Creates a hash with the letters as a key and the numbers as values
+
 	def table
+		@tHash = Hash.new([])
+		@tile_letters = letters
 		@tile_vals = values
 		@pieces.each_with_index do |piece, index|
 			@tHash[@tile_letters[index].to_sym] = @tile_vals[index]
@@ -157,43 +161,80 @@ class Scorer
 
 	attr_accessor :max
 
+	#Initializes the hash 'max' and gives the scorer access to the board
+
 	def initialize
 		@max = { :val => 0, :word => "", :row => 0, :col => 0, :horiz => true }
-		@point_value = 0
 		board = Board.new
 		@field = board.mults
 	end
 
+	#Calculates the score by multiplying the multipliers from each possible
+	#move by the value of each letter
+
 	def check_score(bound, incr_coord, fixed_coord, piece, word, horiz)
 		@total = 0
 		@i = 0
+		@pt = 0
 		@len = piece.length
+		
+		#If the word will fit in the space left on the board (between the edge
+		#and the current position being tested)
+
 		if bound - incr_coord >= @len
+			
+			#Rather than increment the variable incr_coord, we make a copy so 
+			#when we go to store the starting position in max, incr_coord
+			#has the correct value
+
 			@c = incr_coord
+			
+			#i increments through the length of word
+
 			while @i < @len do
+
+				#Depending on whether the word reads horizontally or not, the
+				#fixed_coord is in either the row or column position
+
 				@pt = horiz ? @field[fixed_coord][@c] : @field[@c][fixed_coord]
 				@total += @pt.to_i * piece[@i]
+					#This multiplies the multiplier on the board by the value of
+					#the letter. i and c are then incremented by 1
 				@i += 1
 				@c += 1
 			end
 			check_max(@total, word, horiz, fixed_coord, incr_coord)
+				#This checks if the new total is greater than the max score.
 		end
 
 		return @max
 	end
 
-	def check_max(comp_total, comp_word, bool, comp_fcoord, comp_icoord)
+	#Compares the current score to the maximum score. If it is greater, all
+	#information about the current configuration is stored in the hash 'max'
+
+	def check_max(comp_total, comp_word, horiz, comp_fcoord, comp_icoord)
 		if @max[:val] < comp_total
+
 			@max[:val] = comp_total
 			@max[:word] = comp_word
-			if bool
+
+			#If the word is horizontal (reads left to right), then it increments
+			#along the column.
+
+			if horiz
 				@max[:row] = comp_fcoord
 				@max[:col] = comp_icoord
+
+			#Otherwise, it reads from top to bottom, and increments by row
+
 			else
 				@max[:row] = comp_icoord
 				@max[:col] = comp_fcoord
 			end
-			@max[:horiz] = bool
+			
+			@max[:horiz] = horiz
+
 		end
 	end
 
