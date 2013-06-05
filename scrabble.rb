@@ -197,14 +197,8 @@ class Scorer
 
 end
 
-###############################################################################
-
 board = Board.new
 field = board.mults
-
-tiles = TileSet.new
-tile_letters = tiles.letters
-table = tiles.table
 
 dict = Dictionary.new
 moves = dict.possible_moves
@@ -213,6 +207,10 @@ vals = dict.move_vals
 scorer = Scorer.new
 max = scorer.max
 
+# Goes through vals, an array of arrays of each word's letters, one
+# word at a time. Finds words that are possible by checking with dictionary.
+# Then it checks the scores going through the rows and columns and finds
+# the biggest word and its position.
 vals.each do |piece|
 	word = moves[vals.index(piece)]
 	field.each_with_index do |line, index_row|
@@ -223,6 +221,7 @@ vals.each do |piece|
 	end
 end
 
+# Turns biggest word into an array so it can be placed in the output board.
 word_letters = max[:word].split(//)
 
 word_letters.each do |letter|
