@@ -2,16 +2,20 @@ class Parser
 	attr_accessor :board, :dictionary, :tiles
 
 	def initialize
+		# make array of lines of the input file
 		@lines = []
 		File.open("INPUT.json") do |file|
 			@lines = file.map { |line| line }
 		end
+
+		# find where in the array these words appear
 		@board = @lines.index{|e| e=~ /board/}
 		@dictionary = @lines.index{|e| e=~ /dictionary/}
 		@tiles = @lines.index{|e| e=~ /tiles/}
 		@info = Hash.new([])
 	end
 
+	# return an array containing just the desired content
 	def make_arrays(target, ref, symbol)
 		xray = []
 		while target < (ref - 2) do
@@ -91,7 +95,6 @@ class TileSet
 end
 
 class Dictionary
-
 	attr_reader :makeable
 
 	def initialize
@@ -99,28 +102,24 @@ class Dictionary
 		tiles = TileSet.new
 		@dictionary = parser.make_arrays(parser.dictionary, parser.tiles, "dictionary")
 		@moves = []
-		@word_letters = []
 		@makeable = true
 		@tile_list = tiles.letters
 		@table = tiles.table
-		@vals = []
 	end
 
 	def possible_moves
 
-		#For each word, this loop checks if it is possible, given the tiles
-
+		# For each word, this loop checks if it is possible, given the tiles
 		@dictionary.each do |current_word|
 			@makeable = true
 			@tiles_dup = @tile_list.dup
-			@word_letters = current_word.split(//) 
+			word_letters = current_word.split(//) 
 				#Turns the word into an array of its letters
 
-			#For each letter in the word, the loop checks if the current letter 
-			#is an available tile in the duplicate list if it is possible, the 
-			#letter is deleted from word_letters and the list of available tiles
-
-			@word_letters.each do |current_letter|
+			# For each letter in the word, the loop checks if the current letter 
+			# is an available tile in the duplicate list. If it is possible, the 
+			# letter is deleted from word_letters and the list of available tiles
+			word_letters.each do |current_letter|
 				if @tiles_dup.include? current_letter
 					@tiles_dup.delete_at(@tiles_dup.index(current_letter))
 				else
@@ -129,32 +128,31 @@ class Dictionary
 				end
 			end
 
-			#If there are any letters that did not match to a tile, then valid 
-			#will be false. Otherwise, it's added to the array of possible words
-
+			# If there are any letters that did not match to a tile, then valid 
+			# will be false. Otherwise, it's added to the array of possible words
 			if @makeable
 				@moves << current_word
 			end
 		end
-
 		return @moves
-
 	end
 
+	# turn makeable words into array of their letters, puts each array into
+	# vals, an array containing arrays of each words' letters
 	def move_vals
+		vals = []
 		@moves.each do |word|
-			@word_letters = word.split(//)
-			@word_vals = []
+			word_letters = word.split(//)
+			word_vals = []
 
-			@word_letters.each do |letter|
-				@word_vals << @table[letter.to_sym]
+			word_letters.each do |letter|
+				word_vals << @table[letter.to_sym]
 			end
 
-			@vals << @word_vals
+			vals << word_vals
 		end
-		return @vals
+		return vals
 	end
-
 end
 
 class Scorer
@@ -240,14 +238,8 @@ class Scorer
 
 end
 
-###############################################################################
-
 board = Board.new
 field = board.mults
-
-tiles = TileSet.new
-tile_letters = tiles.letters
-table = tiles.table
 
 dict = Dictionary.new
 moves = dict.possible_moves
@@ -256,6 +248,10 @@ vals = dict.move_vals
 scorer = Scorer.new
 max = scorer.max
 
+# Goes through vals, an array of arrays of each word's letters, one
+# word at a time. Finds words that are possible by checking with dictionary.
+# Then it checks the scores going through the rows and columns and finds
+# the biggest word and its position.
 vals.each do |piece|
 	word = moves[vals.index(piece)]
 	field.each_with_index do |line, index_row|
@@ -266,6 +262,7 @@ vals.each do |piece|
 	end
 end
 
+# Turns biggest word into an array so it can be placed in the output board.
 word_letters = max[:word].split(//)
 
 word_letters.each do |letter|
