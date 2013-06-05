@@ -1,7 +1,8 @@
 class Parser
-	attr_accessor :board, :dictionary, :tiles, :lines
+	attr_accessor :board, :dictionary, :tiles
 
 	def initialize
+		@lines = []
 		File.open("INPUT.json") do |file|
 			@lines = file.map { |line| line }
 		end
@@ -26,6 +27,8 @@ class Parser
 		return @lines.length
 	end
 end
+
+parser = Parser.new
 
 class Board
 
@@ -52,12 +55,10 @@ class TileSet
 
 	def initialize
 		parser = Parser.new
-		dict = Dictionary.new
-		tHash = Hash.new([])
+		@tHash = Hash.new([])
 		@pieces = parser.make_arrays(parser.tiles, parser.length - 1, "tiles")
 		@tile_letters = []
 		@tile_vals = []
-		@moves = dict.possible_moves
 		@word_values = []
 		@letters = []
 		@num = 0
@@ -66,23 +67,23 @@ class TileSet
 	def letters
 		@pieces.each do |piece|
 			@tile_letters << piece[0]
-			tHash[piece[0].to_sym] = piece.gsub(/\D/, '').to_i
 		end
 		return @tile_letters
 	end
-
-	#Turn given word into array of its letters' values
 	
 	def values
-		@moves.each do |current_word|
-			@letters = current_word.split(//)
-			@letters.each do |current_letter|
-				@num = tHash[current_letter.to_sym]
-				@word_values << num
-			end
-			@tile_vals << @word_values
+		@pieces.each do |piece|
+			@tile_vals << piece.gsub(/\D/, '').to_i
 		end
 		return @tile_vals
+	end
+
+	def table
+		@tile_vals = values
+		@pieces.each_with_index do |piece, index|
+			@tHash[@tile_letters[index].to_sym] = @tile_vals[index]
+		end
+		return @tHash
 	end
 
 end
@@ -98,15 +99,17 @@ class Dictionary
 		@moves = []
 		@word_letters = []
 		@makeable = true
-		@tiles_dup = tiles.letters
+		@tile_list = tiles.letters
+		@table = tiles.table
+		@vals = []
 	end
 
 	def possible_moves
-
 		#For each word, this loop checks if it is possible, given the tiles
 
 		@dictionary.each do |current_word|
-			
+			@makeable = true
+			@tiles_dup = @tile_list.dup
 			@word_letters = current_word.split(//) 
 				#Turns the word into an array of its letters
 
@@ -135,18 +138,32 @@ class Dictionary
 
 	end
 
+	def move_vals
+		@moves.each do |word|
+			@word_letters = word.split(//)
+			@word_vals = []
+
+			@word_letters.each do |letter|
+				@word_vals << @table[letter.to_sym]
+			end
+
+			@vals << @word_vals
+		end
+		return @vals
+	end
+
 end
 
 board = Board.new
 field = board.mults
 
 tiles = TileSet.new
-pieces = tiles.pieces
 tile_letters = tiles.letters
-tile_vals = tiles.values
+table = tiles.table
 
 dict = Dictionary.new
 moves = dict.possible_moves
+vals = dict.move_vals
 
 max = { :val => 0, :word => "", :row => 0, :col => 0, :horiz => true }
 
@@ -176,9 +193,9 @@ def check_score(bound, incr_coord, fixed_coord, field, piece, word, len, max, is
 	end
 end
 
-tile_vals.each do |piece|
+vals.each do |piece|
 	len = piece.length
-	word = moves[tile_vals.index(piece)]
+	word = moves[vals.index(piece)]
 	field.each_with_index do |line, index_row|
 		field[index_row].each_with_index do |column, index_col|
 			check_score(board.width, index_col, index_row, field, piece, word, len, max, true)
