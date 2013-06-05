@@ -103,6 +103,7 @@ class Dictionary
 	end
 
 	def possible_moves
+
 		#For each word, this loop checks if it is possible, given the tiles
 
 		@dictionary.each do |current_word|
@@ -111,9 +112,9 @@ class Dictionary
 			@word_letters = current_word.split(//) 
 				#Turns the word into an array of its letters
 
-			#For each letter in the word, the loop checks if the current letter is an 
-			#available tile in the duplicate list if it is possible, the letter is 
-			#deleted from word_letters and from the list of available tiles
+			#For each letter in the word, the loop checks if the current letter 
+			#is an available tile in the duplicate list if it is possible, the 
+			#letter is deleted from word_letters and the list of available tiles
 
 			@word_letters.each do |current_letter|
 				if @tiles_dup.include? current_letter
@@ -124,8 +125,8 @@ class Dictionary
 				end
 			end
 
-			#If there are any letters that did not match to a tile, then valid will be 
-			#false. Otherwise, it is added to the array of possible words
+			#If there are any letters that did not match to a tile, then valid 
+			#will be false. Otherwise, it's added to the array of possible words
 
 			if @makeable
 				@moves << current_word
@@ -163,19 +164,19 @@ class Scorer
 		@field = board.mults
 	end
 
-	def check_score(bound, incr_coord, fixed_coord, piece, word, isHoriz)
+	def check_score(bound, incr_coord, fixed_coord, piece, word, horiz)
 		@total = 0
 		@i = 0
 		@len = piece.length
 		if bound - incr_coord >= @len
 			@c = incr_coord
 			while @i < @len do
-				@point_value = isHoriz ? @field[fixed_coord][@c].to_i : @field[@c][fixed_coord].to_i
-				@total += @point_value * piece[@i]
+				@pt = horiz ? @field[fixed_coord][@c] : @field[@c][fixed_coord]
+				@total += @pt.to_i * piece[@i]
 				@i += 1
 				@c += 1
 			end
-			check_max(@total, word, isHoriz, fixed_coord, incr_coord)
+			check_max(@total, word, horiz, fixed_coord, incr_coord)
 		end
 
 		return @max
@@ -197,6 +198,8 @@ class Scorer
 	end
 
 end
+
+###############################################################################
 
 board = Board.new
 field = board.mults
@@ -222,17 +225,11 @@ vals.each do |piece|
 	end
 end
 
-
-
 word_letters = max[:word].split(//)
 
 word_letters.each do |letter|
 	field[max[:row]][max[:col]] = letter
-	if max[:horiz]
-		max[:col] += 1
-	else
-		max[:row] += 1 
-	end
+	max[:horiz] ? max[:col] += 1 : max[:row] += 1
 end
 
 field.each do |row|
